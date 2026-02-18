@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Numa — Your numerology companion. Discover your Life Path number, personal cycles, and Power Days. Decode the ancient mathematics of who you are.">
+  <meta name="theme-color" content="#18181b">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Numa — Your Numerology Companion">
+  <meta property="og:description" content="Discover your Life Path number, personal cycles, and Power Days. Decode the ancient mathematics of who you are.">
+  <meta property="og:site_name" content="Numa">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Numa — Your Numerology Companion">
+  <meta name="twitter:description" content="Discover your Life Path number and personal cycles. Your numerology companion.">
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+  <title>Numa — Your Numerology Companion</title>
+  <style>
+    /* ========================================
+       CSS Custom Properties (from theme.ts)
+       ======================================== */
+    :root {
+      --bg: #18181b;
+      --bg-deep: #1a1a2e;
+      --fg: #fafafa;
+      --card: #27272a;
+      --card-hover: #3f3f46;
+      --primary: #3b82f6;
+      --secondary: #2d2d30;
+      --muted: #a1a1aa;
+      --border: #3f3f46;
+      --life-path: #a855f7;
+      --message: #d4a855;
+      --success: #22c55e;
+      --destructive: #ef4444;
+      --primary-alpha: rgba(59, 130, 246, 0.2);
+      --card-alpha: rgba(39, 39, 42, 0.8);
+
+      --grad-primary: linear-gradient(135deg, #3b82f6, #a855f7);
+      --grad-ask-numa: linear-gradient(135deg, #d4a855, #ec4899);
+      --grad-premium: linear-gradient(135deg, #d4a855, #f59e0b);
+
+      --radius-sm: 12px;
+      --radius-md: 16px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+
+      --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* ========================================
+       Reset & Global
+       ======================================== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--fg);
+      overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    ::selection { background: rgba(59, 130, 246, 0.3); color: var(--fg); }
+    *:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+    a { color: var(--primary); text-decoration: none; }
+    img { max-width: 100%; }
+
+    /* ========================================
+       Layout
+       ======================================== */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .section-padding { padding: 100px 0; }
+
+    /* ========================================
+       Gradient Text
+       ======================================== */
+    .gradient-text {
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ========================================
+       Scroll Reveal Animation
+       ======================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ========================================
+       Navigation
+       ======================================== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease;
+    }
+    .nav.scrolled {
+      background: rgba(24, 24, 27, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--grad-primary);
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+    }
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3); }
+
+    /* Nav Links */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--fg); }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--fg);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* Mobile Menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      background: rgba(24, 24, 27, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px 24px;
+      z-index: 99;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 500;
+      text-decoration: none;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(63, 63, 70, 0.5);
+      transition: color 0.2s ease;
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { color: var(--fg); }
+
+    /* ========================================
+       1. HERO
+       ======================================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 80px 24px 40px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 50%, var(--bg) 100%);
+      z-index: 0;
+    }
+
+    /* Glow Orbs */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .glow-blue {
+      width: 500px; height: 500px;
+      top: -150px; right: -100px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+      animation: glow-pulse 8s ease-in-out infinite;
+    }
+    .glow-purple {
+      width: 400px; height: 400px;
+      bottom: -100px; left: -80px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+      animation: glow-pulse 10s ease-in-out infinite reverse;
+    }
+    @keyframes glow-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* Floating Number Particles */
+    .particle {
+      position: absolute;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.04);
+      pointer-events: none;
+      user-select: none;
+      will-change: transform, opacity;
+    }
+    .p1  { font-size: 60px; top: 8%;  left: 5%;  animation: float1 22s ease-in-out infinite alternate; }
+    .p2  { font-size: 40px; top: 15%; left: 85%; animation: float2 28s ease-in-out infinite alternate; }
+    .p3  { font-size: 70px; top: 30%; left: 12%; animation: float3 20s ease-in-out infinite alternate; }
+    .p4  { font-size: 35px; top: 50%; left: 75%; animation: float4 25s ease-in-out infinite alternate; }
+    .p5  { font-size: 55px; top: 70%; left: 8%;  animation: float5 30s ease-in-out infinite alternate; }
+    .p6  { font-size: 45px; top: 20%; left: 50%; animation: float6 18s ease-in-out infinite alternate; }
+    .p7  { font-size: 80px; top: 60%; left: 90%; animation: float7 35s ease-in-out infinite alternate; }
+    .p8  { font-size: 30px; top: 80%; left: 40%; animation: float8 24s ease-in-out infinite alternate; }
+    .p9  { font-size: 50px; top: 5%;  left: 65%; animation: float9 27s ease-in-out infinite alternate; }
+    .p10 { font-size: 65px; top: 40%; left: 30%; animation: float10 32s ease-in-out infinite alternate; }
+    .p11 { font-size: 38px; top: 85%; left: 70%; animation: float11 19s ease-in-out infinite alternate; }
+    .p12 { font-size: 48px; top: 25%; left: 92%; animation: float12 26s ease-in-out infinite alternate; }
+    .p13 { font-size: 42px; top: 75%; left: 20%; animation: float13 23s ease-in-out infinite alternate; }
+    .p14 { font-size: 58px; top: 45%; left: 55%; animation: float14 29s ease-in-out infinite alternate; }
+    .p15 { font-size: 33px; top: 10%; left: 35%; animation: float15 21s ease-in-out infinite alternate; }
+    .p16 { font-size: 52px; top: 90%; left: 60%; animation: float16 33s ease-in-out infinite alternate; }
+
+    @keyframes float1  { 0% { transform: translate(0, 0); opacity: 0.03; } 100% { transform: translate(15px, -50px); opacity: 0.08; } }
+    @keyframes float2  { 0% { transform: translate(0, 0); opacity: 0.05; } 100% { transform: translate(-20px, 40px); opacity: 0.03; } }
+    @keyframes float3  { 0% { transform: translate(0, 0); opacity: 0.04; } 100% { transform: translate(25px, -60px); opacity: 0.09; } }
+    @keyframes float4  { 0% { transform: translate(0, 0); opacity: 0.06; } 100% { transform: translate(-15px, 35px); opacity: 0.03; } }
+    @keyframes float5  { 0% { transform: translate(0, 0); opacity: 0.03; } 100% { transform: translate(10px, -45px); opacity: 0.07; } }
+    @keyframes float6  { 0% { transform: translate(0, 0); opacity: 0.05; } 100% { transform: translate(-25px, 55px); opacity: 0.04; } }
+    @keyframes float7  { 0% { transform: translate(0, 0); opacity: 0.02; } 100% { transform: translate(20px, -70px); opacity: 0.06; } }
+    @keyframes float8  { 0% { transform: translate(0, 0); opacity: 0.04; } 100% { transform: translate(-10px, 30px); opacity: 0.08; } }
+    @keyframes float9  { 0% { transform: translate(0, 0); opacity: 0.06; } 100% { transform: translate(18px, -40px); opacity: 0.03; } }
+    @keyframes float10 { 0% { transform: translate(0, 0); opacity: 0.03; } 100% { transform: translate(-22px, 50px); opacity: 0.07; } }
+    @keyframes float11 { 0% { transform: translate(0, 0); opacity: 0.05; } 100% { transform: translate(12px, -55px); opacity: 0.04; } }
+    @keyframes float12 { 0% { transform: translate(0, 0); opacity: 0.04; } 100% { transform: translate(-18px, 45px); opacity: 0.06; } }
+    @keyframes float13 { 0% { transform: translate(0, 0); opacity: 0.06; } 100% { transform: translate(22px, -35px); opacity: 0.03; } }
+    @keyframes float14 { 0% { transform: translate(0, 0); opacity: 0.03; } 100% { transform: translate(-14px, 60px); opacity: 0.08; } }
+    @keyframes float15 { 0% { transform: translate(0, 0); opacity: 0.05; } 100% { transform: translate(16px, -48px); opacity: 0.04; } }
+    @keyframes float16 { 0% { transform: translate(0, 0); opacity: 0.04; } 100% { transform: translate(-20px, 42px); opacity: 0.06; } }
+
+    /* Hero Content */
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 680px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Calculator Card */
+    .calc-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      backdrop-filter: blur(16px);
+      position: relative;
+    }
+    .calc-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: var(--radius-xl);
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(168,85,247,0.2));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    .calc-label {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    .calc-inputs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .calc-field {
+      flex: 1;
+    }
+    .calc-field label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .calc-field input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--fg);
+      font-size: 18px;
+      font-weight: 600;
+      padding: 12px 14px;
+      text-align: center;
+      font-family: var(--font);
+      transition: border-color 0.2s ease;
+    }
+    .calc-field input::placeholder { color: rgba(161, 161, 170, 0.4); }
+    .calc-field input:focus { border-color: var(--primary); outline: none; }
+    .calc-field input.error { border-color: var(--destructive); }
+    .calc-field-year { flex: 1.4; }
+
+    /* CTA Buttons */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      background: var(--grad-primary);
+      color: #fff;
+      border: none;
+      padding: 16px 32px;
+      border-radius: var(--radius-full);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(59, 130, 246, 0.3); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-premium {
+      background: var(--grad-premium);
+      color: var(--bg);
+    }
+    .btn-premium:hover { box-shadow: 0 8px 30px rgba(212, 168, 85, 0.3); }
+
+    /* Calculator Result */
+    .calc-result {
+      margin-top: 24px;
+      text-align: center;
+      animation: result-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes result-reveal {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .result-number-ring {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--grad-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      position: relative;
+      animation: ring-glow 2s ease-in-out infinite;
+    }
+    @keyframes ring-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 60px rgba(168, 85, 247, 0.1); }
+      50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 80px rgba(168, 85, 247, 0.2); }
+    }
+    .result-number-inner {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 700;
+    }
+    .result-archetype {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .result-desc {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    /* Scroll Indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+    .scroll-indicator span {
+      display: block;
+      width: 24px;
+      height: 24px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      animation: scroll-bounce 2s ease-in-out infinite;
+      opacity: 0.5;
+    }
+    @keyframes scroll-bounce {
+      0%, 100% { transform: rotate(45deg) translate(0, 0); opacity: 0.3; }
+      50% { transform: rotate(45deg) translate(5px, 5px); opacity: 0.6; }
+    }
+
+    /* ========================================
+       2. SOCIAL PROOF
+       ======================================== */
+    .social-proof {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 0;
+    }
+    .proof-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .proof-item {
+      color: var(--muted);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .proof-item strong { color: var(--fg); font-weight: 600; }
+    .proof-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+    .proof-star { color: #eab308; }
+
+    /* ========================================
+       3. HOW IT WORKS
+       ======================================== */
+    .section-heading {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .section-heading h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--muted);
+      font-size: 18px;
+      margin-bottom: 60px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .how-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      text-align: center;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .how-card:hover { transform: translateY(-4px); border-color: rgba(59, 130, 246, 0.3); }
+    .how-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-sm);
+      background: var(--primary-alpha);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .how-icon svg { width: 24px; height: 24px; color: var(--primary); }
+    .how-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .how-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .how-step-num {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    /* ========================================
+       4. FEATURE SHOWCASE
+       ======================================== */
+    .feature-row {
+      display: flex;
+      align-items: center;
+      gap: 80px;
+      margin-bottom: 120px;
+    }
+    .feature-row:last-child { margin-bottom: 0; }
+    .feature-row.reverse { flex-direction: row-reverse; }
+    .feature-text { flex: 1; }
+    .feature-text .feature-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+    .feature-text h3 {
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    .feature-text p {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .feature-bullets {
+      list-style: none;
+      margin-top: 20px;
+    }
+    .feature-bullets li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .feature-bullets li svg { color: var(--success); flex-shrink: 0; }
+    .feature-mockup { flex-shrink: 0; }
+
+    /* Phone Mockup */
+    .phone {
+      width: 280px;
+      height: 560px;
+      background: var(--bg);
+      border: 3px solid var(--border);
+      border-radius: 40px;
+      padding: 8px;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(59, 130, 246, 0.05);
+    }
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 26px;
+      background: var(--bg);
+      border-radius: 0 0 18px 18px;
+      z-index: 10;
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 32px;
+      overflow: hidden;
+      background: var(--bg-deep);
+      position: relative;
+    }
+
+    /* Mockup: Profile Screen */
+    .mock-profile { padding: 40px 16px 16px; }
+    .mock-lp-card {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .mock-lp-num {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 8px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .mock-lp-title { font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 500; }
+    .mock-lp-arch { font-size: 16px; font-weight: 700; color: #fff; margin-top: 4px; }
+    .mock-numbers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .mock-num-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+    .mock-num-val { font-size: 18px; font-weight: 700; color: var(--fg); }
+    .mock-num-label { font-size: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+    /* Mockup: Home Screen */
+    .mock-home { padding: 40px 16px 16px; text-align: center; }
+    .mock-greeting { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+    .mock-date { font-size: 12px; color: var(--fg); font-weight: 600; margin-bottom: 16px; }
+    .mock-dial {
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      border: 3px solid rgba(59,130,246,0.3);
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .mock-dial-num { font-size: 42px; font-weight: 700; }
+    .mock-dial-label { font-size: 10px; color: var(--muted); margin-bottom: 16px; }
+    .mock-theme-title { font-size: 14px; font-weight: 600; color: var(--fg); margin-bottom: 4px; }
+    .mock-theme-desc { font-size: 10px; color: var(--muted); line-height: 1.4; margin-bottom: 16px; padding: 0 8px; }
+    .mock-cycles-row {
+      display: flex;
+      gap: 8px;
+    }
+    .mock-cycle-card {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+    .mock-cycle-num { font-size: 18px; font-weight: 700; }
+    .mock-cycle-label { font-size: 7px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Mockup: Chat Screen */
+    .mock-chat { display: flex; flex-direction: column; height: 100%; }
+    .mock-chat-header {
+      background: linear-gradient(135deg, #3b82f6, #a855f7);
+      padding: 36px 16px 12px;
+      text-align: center;
+    }
+    .mock-chat-title { font-size: 14px; font-weight: 700; color: #fff; }
+    .mock-chat-subtitle { font-size: 9px; color: rgba(255,255,255,0.7); }
+    .mock-chat-body {
+      flex: 1;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+    .mock-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+    .mock-bubble-ai {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .mock-bubble-user {
+      background: var(--primary);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .mock-chat-input {
+      display: flex;
+      gap: 8px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+      align-items: center;
+    }
+    .mock-input-bar {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .mock-send-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--grad-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Mockup: Calendar Screen */
+    .mock-calendar { padding: 40px 12px 12px; }
+    .mock-cal-header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .mock-cal-month { font-size: 14px; font-weight: 700; color: var(--fg); }
+    .mock-cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .mock-cal-day-header {
+      font-size: 8px;
+      color: var(--muted);
+      text-align: center;
+      padding: 4px 0;
+      font-weight: 600;
+    }
+    .mock-cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 10px;
+      color: var(--fg);
+      position: relative;
+      gap: 2px;
+    }
+    .mock-cal-day .day-num { font-weight: 500; }
+    .mock-cal-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+    }
+    .mock-cal-power {
+      background: rgba(59, 130, 246, 0.15);
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+    }
+    .mock-cal-today {
+      border: 1px solid var(--primary);
+    }
+
+    /* ========================================
+       5. LIFE PATH CAROUSEL
+       ======================================== */
+    .carousel-section { padding: 100px 0; overflow: hidden; }
+    .carousel-track {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px 24px 40px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .carousel-track::-webkit-scrollbar { display: none; }
+    .lp-card {
+      min-width: 200px;
+      scroll-snap-align: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      text-align: center;
+      flex-shrink: 0;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+    .lp-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+    .lp-card.highlighted {
+      border-color: var(--primary);
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.2), 0 0 60px rgba(168, 85, 247, 0.1);
+    }
+    .lp-card.highlighted::after {
+      content: 'Your Number';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--grad-primary);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+    .lp-card-number {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .lp-card-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--fg);
+    }
+    .lp-card-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ========================================
+       6. TESTIMONIALS
+       ======================================== */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .testimonial-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      position: relative;
+    }
+    .testimonial-quote-mark {
+      font-size: 48px;
+      line-height: 1;
+      color: rgba(59, 130, 246, 0.15);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .testimonial-text {
+      font-size: 15px;
+      color: var(--fg);
+      line-height: 1.7;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .testimonial-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .testimonial-lp {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-alpha);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+    }
+
+    /* ========================================
+       7. PREMIUM
+       ======================================== */
+    .premium-section {
+      background: linear-gradient(180deg, var(--bg) 0%, rgba(212, 168, 85, 0.04) 50%, var(--bg) 100%);
+    }
+    .premium-container { text-align: center; max-width: 600px; }
+    .premium-badge {
+      display: inline-block;
+      background: var(--grad-premium);
+      color: var(--bg);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 20px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+    .premium-container h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .premium-container > p {
+      color: var(--muted);
+      font-size: 18px;
+      margin-bottom: 40px;
+    }
+    .premium-features {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 40px;
+      text-align: left;
+      max-width: 360px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .pf-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--fg);
+    }
+    .pf-check {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(34, 197, 94, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .pf-check svg { width: 12px; height: 12px; color: var(--success); }
+
+    .pricing-cards {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 32px;
+      justify-content: center;
+    }
+    .price-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      text-align: center;
+      flex: 1;
+      max-width: 200px;
+      transition: border-color 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    .price-card:hover { border-color: rgba(212, 168, 85, 0.4); }
+    .price-card.featured {
+      border-color: var(--message);
+      box-shadow: 0 0 30px rgba(212, 168, 85, 0.1);
+    }
+    .save-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: var(--success);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .price-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .price-amount {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--fg);
+    }
+    .price-amount span { font-size: 14px; color: var(--muted); font-weight: 400; }
+    .price-billed {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ========================================
+       8. FINAL CTA
+       ======================================== */
+    .final-cta {
+      position: relative;
+      padding: 120px 0;
+      text-align: center;
+      overflow: hidden;
+    }
+    .final-cta-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%);
+    }
+    .final-cta .container { position: relative; z-index: 1; }
+    .final-cta h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      margin-bottom: 32px;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+    }
+    .final-cta .btn-primary { width: auto; padding: 18px 48px; font-size: 18px; margin-bottom: 32px; }
+    .store-badges {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .store-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 24px;
+      color: var(--fg);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .store-badge:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .store-badge svg { width: 20px; height: 20px; }
+    .store-badge-sub { font-size: 10px; color: var(--muted); display: block; text-align: left; }
+    .store-badge-main { font-size: 16px; font-weight: 600; display: block; text-align: left; }
+
+    /* ========================================
+       ABOUT SECTION
+       ======================================== */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .about-narrative h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--fg);
+    }
+    .about-narrative p {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+    .value-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .value-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: border-color 0.3s ease;
+    }
+    .value-card:hover { border-color: rgba(59, 130, 246, 0.3); }
+    .value-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      background: var(--primary-alpha);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .value-card-icon svg { width: 20px; height: 20px; color: var(--primary); }
+    .value-card h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--fg);
+    }
+    .value-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ========================================
+       CONTACT SECTION
+       ======================================== */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+    }
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--fg);
+      font-size: 15px;
+      padding: 12px 16px;
+      font-family: var(--font);
+      transition: border-color 0.2s ease;
+      resize: vertical;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: rgba(161, 161, 170, 0.4); }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--primary); outline: none; }
+    .form-group textarea { min-height: 120px; }
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 32px;
+    }
+    .form-success-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(34, 197, 94, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .form-success-icon svg { width: 24px; height: 24px; color: var(--success); }
+    .form-success h4 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .form-success p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .contact-info-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .contact-info-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      background: var(--primary-alpha);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .contact-info-icon svg { width: 20px; height: 20px; color: var(--primary); }
+    .contact-info-card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--fg);
+    }
+    .contact-info-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .contact-info-card a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .contact-info-card a:hover { text-decoration: underline; }
+
+    /* FAQ */
+    .faq { margin-top: 64px; }
+    .faq-heading {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .faq-heading h3 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .faq-list {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 20px 0;
+      text-align: left;
+      cursor: pointer;
+      font-family: var(--font);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .faq-question:hover { color: var(--primary); }
+    .faq-chevron {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+      color: var(--muted);
+    }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .faq-item.open .faq-answer { max-height: 200px; }
+    .faq-answer p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      padding-bottom: 20px;
+    }
+
+    /* ========================================
+       FOOTER (Professional)
+       ======================================== */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 64px 0 0;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    .footer-brand-tagline {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 12px 0 20px;
+    }
+    .footer-logo {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--fg);
+    }
+    .social-icons {
+      display: flex;
+      gap: 12px;
+    }
+    .social-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+    .social-icon:hover { border-color: var(--primary); color: var(--primary); }
+    .social-icon svg { width: 16px; height: 16px; }
+    .footer-col h5 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--fg);
+      margin-bottom: 16px;
+    }
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-col a {
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .footer-col a:hover { color: var(--fg); }
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .footer-made {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .footer-heart { color: var(--destructive); }
+
+    /* ========================================
+       RESPONSIVE
+       ======================================== */
+    @media (max-width: 1024px) {
+      .feature-row { gap: 48px; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .section-padding { padding: 64px 0; }
+      .how-grid { grid-template-columns: 1fr; gap: 16px; }
+      .feature-row,
+      .feature-row.reverse { flex-direction: column; gap: 40px; }
+      .feature-mockup { order: -1; }
+      .phone { width: 240px; height: 480px; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+      .pricing-cards { flex-direction: column; align-items: center; }
+      .price-card { max-width: 280px; width: 100%; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      .proof-divider { display: none; }
+      .proof-bar { gap: 16px; }
+      .carousel-section { padding: 64px 0; }
+      .final-cta { padding: 80px 0; }
+    }
+
+    @media (max-width: 480px) {
+      .calc-inputs { flex-direction: column; }
+      .calc-card { padding: 24px 20px; }
+      .hero h1 { letter-spacing: -0.5px; }
+      .phone { width: 220px; height: 440px; }
+      .mock-dial { width: 110px; height: 110px; }
+      .mock-dial-num { font-size: 32px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+
+    /* ========================================
+       REDUCED MOTION
+       ======================================== */
+    @media (prefers-reduced-motion: reduce) {
+      .particle, .glow-orb, .scroll-indicator span { animation: none !important; }
+      .reveal { transition: none !important; opacity: 1; transform: none; }
+      .calc-result { animation: none !important; }
+      .result-number-ring { animation: none !important; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================
+       NAVIGATION
+       ======================================== -->
+  <nav class="nav" id="nav">
+    <div class="container nav-inner">
+      <div class="nav-logo"><span class="gradient-text">NUMA</span></div>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#premium">Pricing</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="#calculator" class="nav-cta">Get Your Number</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#features" class="mobile-menu-link">Features</a>
+    <a href="#about" class="mobile-menu-link">About</a>
+    <a href="#premium" class="mobile-menu-link">Pricing</a>
+    <a href="#contact" class="mobile-menu-link">Contact</a>
+    <a href="#calculator" class="mobile-menu-link">Get Your Number</a>
+  </div>
+
+  <!-- ========================================
+       1. HERO
+       ======================================== -->
+  <header class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="glow-orb glow-blue"></div>
+      <div class="glow-orb glow-purple"></div>
+      <span class="particle p1" aria-hidden="true">7</span>
+      <span class="particle p2" aria-hidden="true">3</span>
+      <span class="particle p3" aria-hidden="true">11</span>
+      <span class="particle p4" aria-hidden="true">9</span>
+      <span class="particle p5" aria-hidden="true">1</span>
+      <span class="particle p6" aria-hidden="true">22</span>
+      <span class="particle p7" aria-hidden="true">5</span>
+      <span class="particle p8" aria-hidden="true">8</span>
+      <span class="particle p9" aria-hidden="true">4</span>
+      <span class="particle p10" aria-hidden="true">33</span>
+      <span class="particle p11" aria-hidden="true">6</span>
+      <span class="particle p12" aria-hidden="true">2</span>
+      <span class="particle p13" aria-hidden="true">9</span>
+      <span class="particle p14" aria-hidden="true">11</span>
+      <span class="particle p15" aria-hidden="true">7</span>
+      <span class="particle p16" aria-hidden="true">22</span>
+    </div>
+    <div class="hero-content">
+      <h1>Your life moves<br>by <span class="gradient-text">number</span>.</h1>
+      <p class="hero-sub">Discover the hidden rhythm in your birth date. Numa decodes the ancient mathematics of who you are.</p>
+
+      <div class="calc-card" id="calculator">
+        <div class="calc-label">Enter your birth date</div>
+        <div class="calc-inputs">
+          <div class="calc-field">
+            <label for="birth-month">Month</label>
+            <input type="number" id="birth-month" min="1" max="12" placeholder="MM" inputmode="numeric">
+          </div>
+          <div class="calc-field">
+            <label for="birth-day">Day</label>
+            <input type="number" id="birth-day" min="1" max="31" placeholder="DD" inputmode="numeric">
+          </div>
+          <div class="calc-field calc-field-year">
+            <label for="birth-year">Year</label>
+            <input type="number" id="birth-year" min="1900" max="2026" placeholder="YYYY" inputmode="numeric">
+          </div>
+        </div>
+        <button class="btn-primary" id="calc-btn">Reveal My Number</button>
+        <div class="calc-result" id="calc-result" style="display:none;">
+          <div class="result-number-ring">
+            <div class="result-number-inner" id="result-number"></div>
+          </div>
+          <div class="result-archetype" id="result-archetype"></div>
+          <div class="result-desc" id="result-desc"></div>
+          <button class="btn-primary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+            Get Your Full Reading
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator" aria-hidden="true"><span></span></div>
+  </header>
+
+  <main>
+    <!-- ========================================
+         2. SOCIAL PROOF
+         ======================================== -->
+    <section class="social-proof">
+      <div class="container proof-bar">
+        <div class="proof-item"><strong>10,000+</strong>&nbsp;readings calculated</div>
+        <div class="proof-divider"></div>
+        <div class="proof-item"><span class="proof-star">&#9733;</span>&nbsp;<strong>4.8</strong>&nbsp;star rating</div>
+        <div class="proof-divider"></div>
+        <div class="proof-item">Featured in&nbsp;<strong>Spiritual Living</strong></div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         3. HOW IT WORKS
+         ======================================== -->
+    <section class="section-padding" id="how-it-works">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>How It Works</h2>
+        </div>
+        <p class="section-sub reveal reveal-delay-1">Three steps to decode your personal rhythm</p>
+        <div class="how-grid">
+          <article class="how-card reveal reveal-delay-1">
+            <div class="how-step-num">Step 1</div>
+            <div class="how-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <h3>Enter Your Birth Date</h3>
+            <p>Your birthday holds a mathematical code. We decode it using the Pythagorean system trusted for 2,500 years.</p>
+          </article>
+          <article class="how-card reveal reveal-delay-2">
+            <div class="how-step-num">Step 2</div>
+            <div class="how-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            </div>
+            <h3>Discover Your Rhythm</h3>
+            <p>See your Life Path, personal cycles, and Power Days — days when your energy peaks for manifestation.</p>
+          </article>
+          <article class="how-card reveal reveal-delay-3">
+            <div class="how-step-num">Step 3</div>
+            <div class="how-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <h3>Live in Alignment</h3>
+            <p>Check your daily energy, chat with NUMA — your AI numerology guide — and plan around your natural cycles.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         4. FEATURE SHOWCASE
+         ======================================== -->
+    <section class="section-padding" id="features">
+      <div class="container">
+
+        <!-- Feature 1: Your Numbers -->
+        <div class="feature-row reveal">
+          <div class="feature-text">
+            <span class="feature-tag">Your Profile</span>
+            <h3>Your Numbers, Decoded</h3>
+            <p>Your Life Path, Expression, Soul Urge, and Personality numbers — all calculated from your name and birth date. Each reveals a different facet of who you are.</p>
+            <ul class="feature-bullets">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Life Path with compound number breakdown
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                6 name-based core numbers
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Career paths aligned to your archetype
+              </li>
+            </ul>
+          </div>
+          <div class="feature-mockup">
+            <div class="phone">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="mock-profile">
+                  <div class="mock-lp-card">
+                    <div class="mock-lp-title">LIFE PATH</div>
+                    <div class="mock-lp-num">7</div>
+                    <div class="mock-lp-arch">The Seeker</div>
+                  </div>
+                  <div class="mock-numbers-grid">
+                    <div class="mock-num-card"><div class="mock-num-val">5</div><div class="mock-num-label">Expression</div></div>
+                    <div class="mock-num-card"><div class="mock-num-val">3</div><div class="mock-num-label">Soul Urge</div></div>
+                    <div class="mock-num-card"><div class="mock-num-val">2</div><div class="mock-num-label">Personality</div></div>
+                    <div class="mock-num-card"><div class="mock-num-val">3</div><div class="mock-num-label">Maturity</div></div>
+                    <div class="mock-num-card"><div class="mock-num-val">8</div><div class="mock-num-label">Balance</div></div>
+                    <div class="mock-num-card"><div class="mock-num-val">4</div><div class="mock-num-label">Lucky</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 2: Daily Cycles -->
+        <div class="feature-row reverse reveal">
+          <div class="feature-text">
+            <span class="feature-tag">Daily Insight</span>
+            <h3>Know Your Day Before It Begins</h3>
+            <p>Every day carries a unique energy based on your personal cycle. See today's theme, understand the vibe, and move with it instead of against it.</p>
+            <ul class="feature-bullets">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Personal Day, Month, and Year cycles
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Power Day detection for peak energy
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Theme and keywords for each cycle
+              </li>
+            </ul>
+          </div>
+          <div class="feature-mockup">
+            <div class="phone">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="mock-home">
+                  <div class="mock-greeting">Good morning</div>
+                  <div class="mock-date">Tuesday, February 18</div>
+                  <div class="mock-dial">
+                    <div class="mock-dial-num gradient-text">5</div>
+                  </div>
+                  <div class="mock-dial-label" style="color:var(--muted);">Personal Day</div>
+                  <div class="mock-theme-title">Change & Freedom</div>
+                  <div class="mock-theme-desc">A dynamic day for adventure, variety, and embracing the unexpected.</div>
+                  <div class="mock-cycles-row">
+                    <div class="mock-cycle-card">
+                      <div class="mock-cycle-num gradient-text">3</div>
+                      <div class="mock-cycle-label">Month</div>
+                    </div>
+                    <div class="mock-cycle-card">
+                      <div class="mock-cycle-num gradient-text">9</div>
+                      <div class="mock-cycle-label">Year</div>
+                    </div>
+                    <div class="mock-cycle-card">
+                      <div class="mock-cycle-num gradient-text">7</div>
+                      <div class="mock-cycle-label">Universal</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 3: Chat -->
+        <div class="feature-row reveal">
+          <div class="feature-text">
+            <span class="feature-tag">AI Guide</span>
+            <h3>Ask NUMA Anything</h3>
+            <p>NUMA is your personal numerology guide — an AI that knows your complete profile. Ask about your cycles, compatibility, career alignment, or what today's energy means for you.</p>
+            <ul class="feature-bullets">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Personalized to your full numerology profile
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Smart prompts to get you started
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Conversation history saved
+              </li>
+            </ul>
+          </div>
+          <div class="feature-mockup">
+            <div class="phone">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="mock-chat">
+                  <div class="mock-chat-header">
+                    <div class="mock-chat-title">NUMA</div>
+                    <div class="mock-chat-subtitle">Your numerology guide</div>
+                  </div>
+                  <div class="mock-chat-body">
+                    <div class="mock-bubble mock-bubble-ai">Hi! I'm NUMA, your numerology guide. I can see you're a Life Path 7 — The Seeker. What would you like to explore?</div>
+                    <div class="mock-bubble mock-bubble-user">What does my Personal Day 5 mean for today?</div>
+                    <div class="mock-bubble mock-bubble-ai">Today's a 5 day for you — it's all about freedom, change, and adventure. As a Life Path 7, this energy pulls you out of your analytical comfort zone. Say yes to the unexpected today.</div>
+                  </div>
+                  <div class="mock-chat-input">
+                    <div class="mock-input-bar">Ask NUMA anything...</div>
+                    <div class="mock-send-btn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 4: Calendar -->
+        <div class="feature-row reverse reveal">
+          <div class="feature-text">
+            <span class="feature-tag">Calendar</span>
+            <h3>Your Cosmic Calendar</h3>
+            <p>See your entire month at a glance with color-coded personal days. Spot your Power Days, plan around your cycles, and export everything to Google Calendar.</p>
+            <ul class="feature-bullets">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Color-coded personal day numbers
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Power Day highlighting with glow
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Export to Google Calendar or iCal
+              </li>
+            </ul>
+          </div>
+          <div class="feature-mockup">
+            <div class="phone">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="mock-calendar">
+                  <div class="mock-cal-header">
+                    <div class="mock-cal-month">February 2026</div>
+                  </div>
+                  <div class="mock-cal-grid">
+                    <div class="mock-cal-day-header">S</div>
+                    <div class="mock-cal-day-header">M</div>
+                    <div class="mock-cal-day-header">T</div>
+                    <div class="mock-cal-day-header">W</div>
+                    <div class="mock-cal-day-header">T</div>
+                    <div class="mock-cal-day-header">F</div>
+                    <div class="mock-cal-day-header">S</div>
+                    <!-- Feb 2026 starts on Sunday -->
+                    <div class="mock-cal-day"><span class="day-num">1</span><span class="mock-cal-dot" style="background:#3b82f6"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">2</span><span class="mock-cal-dot" style="background:#a855f7"></span></div>
+                    <div class="mock-cal-day mock-cal-power"><span class="day-num">3</span><span class="mock-cal-dot" style="background:#22c55e"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">4</span><span class="mock-cal-dot" style="background:#f97316"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">5</span><span class="mock-cal-dot" style="background:#3b82f6"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">6</span><span class="mock-cal-dot" style="background:#d4a855"></span></div>
+                    <div class="mock-cal-day mock-cal-power"><span class="day-num">7</span><span class="mock-cal-dot" style="background:#ec4899"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">8</span><span class="mock-cal-dot" style="background:#a855f7"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">9</span><span class="mock-cal-dot" style="background:#22c55e"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">10</span><span class="mock-cal-dot" style="background:#3b82f6"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">11</span><span class="mock-cal-dot" style="background:#f97316"></span></div>
+                    <div class="mock-cal-day mock-cal-power"><span class="day-num">12</span><span class="mock-cal-dot" style="background:#d4a855"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">13</span><span class="mock-cal-dot" style="background:#a855f7"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">14</span><span class="mock-cal-dot" style="background:#ec4899"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">15</span><span class="mock-cal-dot" style="background:#3b82f6"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">16</span><span class="mock-cal-dot" style="background:#22c55e"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">17</span><span class="mock-cal-dot" style="background:#f97316"></span></div>
+                    <div class="mock-cal-day mock-cal-today"><span class="day-num">18</span><span class="mock-cal-dot" style="background:#3b82f6"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">19</span><span class="mock-cal-dot" style="background:#d4a855"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">20</span><span class="mock-cal-dot" style="background:#a855f7"></span></div>
+                    <div class="mock-cal-day mock-cal-power"><span class="day-num">21</span><span class="mock-cal-dot" style="background:#ec4899"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">22</span><span class="mock-cal-dot" style="background:#22c55e"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">23</span><span class="mock-cal-dot" style="background:#3b82f6"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">24</span><span class="mock-cal-dot" style="background:#f97316"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">25</span><span class="mock-cal-dot" style="background:#d4a855"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">26</span><span class="mock-cal-dot" style="background:#a855f7"></span></div>
+                    <div class="mock-cal-day mock-cal-power"><span class="day-num">27</span><span class="mock-cal-dot" style="background:#3b82f6"></span></div>
+                    <div class="mock-cal-day"><span class="day-num">28</span><span class="mock-cal-dot" style="background:#ec4899"></span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================
+         5. LIFE PATH CAROUSEL
+         ======================================== -->
+    <section class="carousel-section" id="life-paths">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>The 12 Life Paths</h2>
+        </div>
+        <p class="section-sub reveal reveal-delay-1">Which number guides your journey?</p>
+      </div>
+      <div class="carousel-track" id="lp-carousel">
+        <div class="lp-card" data-lp="1">
+          <div class="lp-card-number gradient-text">1</div>
+          <div class="lp-card-name">The Leader</div>
+          <div class="lp-card-desc">Independent pioneer who initiates change.</div>
+        </div>
+        <div class="lp-card" data-lp="2">
+          <div class="lp-card-number gradient-text">2</div>
+          <div class="lp-card-name">The Diplomat</div>
+          <div class="lp-card-desc">Sensitive peacemaker who creates harmony.</div>
+        </div>
+        <div class="lp-card" data-lp="3">
+          <div class="lp-card-number gradient-text">3</div>
+          <div class="lp-card-name">The Communicator</div>
+          <div class="lp-card-desc">Creative expresser who inspires joy.</div>
+        </div>
+        <div class="lp-card" data-lp="4">
+          <div class="lp-card-number gradient-text">4</div>
+          <div class="lp-card-name">The Builder</div>
+          <div class="lp-card-desc">Practical builder who creates stability.</div>
+        </div>
+        <div class="lp-card" data-lp="5">
+          <div class="lp-card-number gradient-text">5</div>
+          <div class="lp-card-name">The Freedom Seeker</div>
+          <div class="lp-card-desc">Adventurous soul who embraces change.</div>
+        </div>
+        <div class="lp-card" data-lp="6">
+          <div class="lp-card-number gradient-text">6</div>
+          <div class="lp-card-name">The Nurturer</div>
+          <div class="lp-card-desc">Responsible caretaker who creates harmony.</div>
+        </div>
+        <div class="lp-card" data-lp="7">
+          <div class="lp-card-number gradient-text">7</div>
+          <div class="lp-card-name">The Seeker</div>
+          <div class="lp-card-desc">Analytical thinker who seeks truth.</div>
+        </div>
+        <div class="lp-card" data-lp="8">
+          <div class="lp-card-number gradient-text">8</div>
+          <div class="lp-card-name">The Achiever</div>
+          <div class="lp-card-desc">Ambitious leader who manifests abundance.</div>
+        </div>
+        <div class="lp-card" data-lp="9">
+          <div class="lp-card-number gradient-text">9</div>
+          <div class="lp-card-name">The Humanitarian</div>
+          <div class="lp-card-desc">Compassionate soul who serves others.</div>
+        </div>
+        <div class="lp-card" data-lp="11">
+          <div class="lp-card-number gradient-text">11</div>
+          <div class="lp-card-name">The Intuitive</div>
+          <div class="lp-card-desc">Spiritual messenger with heightened awareness.</div>
+        </div>
+        <div class="lp-card" data-lp="22">
+          <div class="lp-card-number gradient-text">22</div>
+          <div class="lp-card-name">The Master Builder</div>
+          <div class="lp-card-desc">Visionary who turns dreams into reality.</div>
+        </div>
+        <div class="lp-card" data-lp="33">
+          <div class="lp-card-number gradient-text">33</div>
+          <div class="lp-card-name">The Master Teacher</div>
+          <div class="lp-card-desc">Spiritual guide devoted to healing others.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         6. TESTIMONIALS
+         ======================================== -->
+    <section class="section-padding" id="testimonials">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>What People Are Saying</h2>
+        </div>
+        <p class="section-sub reveal reveal-delay-1">Real stories from the Numa community</p>
+        <div class="testimonials-grid">
+          <article class="testimonial-card reveal reveal-delay-1">
+            <div class="testimonial-quote-mark">&ldquo;</div>
+            <p class="testimonial-text">I never took numerology seriously until Numa showed me my Power Days. I scheduled my job interview on one and got the offer. Coincidence? I don't think so.</p>
+            <div class="testimonial-author">
+              <span class="testimonial-name">Sarah K.</span>
+              <span class="testimonial-lp">Life Path 3</span>
+            </div>
+          </article>
+          <article class="testimonial-card reveal reveal-delay-2">
+            <div class="testimonial-quote-mark">&ldquo;</div>
+            <p class="testimonial-text">The daily insights feel eerily accurate. It's like having a cosmic therapist in my pocket. I check my Personal Day every morning now — it's become my ritual.</p>
+            <div class="testimonial-author">
+              <span class="testimonial-name">Marcus T.</span>
+              <span class="testimonial-lp">Life Path 7</span>
+            </div>
+          </article>
+          <article class="testimonial-card reveal reveal-delay-3">
+            <div class="testimonial-quote-mark">&ldquo;</div>
+            <p class="testimonial-text">I added my whole family to My People. Now I understand why my daughter and I clash — and how to work with our energies instead of against them.</p>
+            <div class="testimonial-author">
+              <span class="testimonial-name">Priya R.</span>
+              <span class="testimonial-lp">Life Path 6</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         ABOUT
+         ======================================== -->
+    <section class="section-padding" id="about">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>Built for the Curious</h2>
+        </div>
+        <p class="section-sub reveal reveal-delay-1">The story behind Numa</p>
+        <div class="about-grid">
+          <div class="about-narrative reveal reveal-delay-2">
+            <h3>Ancient Wisdom Meets Modern Technology</h3>
+            <p>Over 2,500 years ago, Pythagoras — the father of mathematics — discovered that numbers aren't just tools for counting. They carry vibrations, patterns, and meaning that reflect the very fabric of who we are.</p>
+            <p>Numa was born from a simple question: <em>What if everyone could access this ancient knowledge as easily as checking the weather?</em></p>
+            <p>We built Numa to be the bridge between Pythagorean numerology and your daily life. No jargon, no gatekeeping — just your numbers, decoded beautifully, with an AI guide who speaks your language.</p>
+            <p>Whether you're navigating a career change, deepening a relationship, or simply curious about what makes you <em>you</em> — your numbers have something to say. We're just here to help you listen.</p>
+          </div>
+          <div class="value-cards reveal reveal-delay-3">
+            <div class="value-card">
+              <div class="value-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+              </div>
+              <div>
+                <h4>Pythagorean Precision</h4>
+                <p>Every calculation uses the authentic Pythagorean method — the same system trusted by practitioners for millennia.</p>
+              </div>
+            </div>
+            <div class="value-card">
+              <div class="value-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              </div>
+              <div>
+                <h4>Privacy First</h4>
+                <p>Your data belongs to you. Full GDPR compliance, data export, and the ability to delete everything at any time.</p>
+              </div>
+            </div>
+            <div class="value-card">
+              <div class="value-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+              </div>
+              <div>
+                <h4>Made with Heart</h4>
+                <p>Designed by people who genuinely believe in the power of self-discovery. Every detail is intentional.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         7. PREMIUM
+         ======================================== -->
+    <section class="section-padding premium-section" id="premium">
+      <div class="container premium-container">
+        <div class="reveal">
+          <div class="premium-badge">Numa Premium</div>
+        </div>
+        <h2 class="reveal reveal-delay-1">Go Deeper</h2>
+        <p class="reveal reveal-delay-2">Unlock unlimited conversations with NUMA, your personal numerology guide</p>
+        <div class="premium-features reveal reveal-delay-2">
+          <div class="pf-item">
+            <span class="pf-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            Unlimited NUMA Chat
+          </div>
+          <div class="pf-item">
+            <span class="pf-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            Unlimited My People profiles
+          </div>
+          <div class="pf-item">
+            <span class="pf-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            Priority support
+          </div>
+          <div class="pf-item">
+            <span class="pf-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            Early access to new features
+          </div>
+        </div>
+        <div class="pricing-cards reveal reveal-delay-3">
+          <div class="price-card">
+            <div class="price-label">Monthly</div>
+            <div class="price-amount">$4.99<span>/mo</span></div>
+          </div>
+          <div class="price-card featured">
+            <div class="save-badge">SAVE 40%</div>
+            <div class="price-label">Annual</div>
+            <div class="price-amount">$2.99<span>/mo</span></div>
+            <div class="price-billed">Billed $35.99/year</div>
+          </div>
+        </div>
+        <div class="reveal reveal-delay-4">
+          <button class="btn-primary btn-premium" style="max-width:320px;margin:0 auto;">Start Your Journey</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         CONTACT
+         ======================================== -->
+    <section class="section-padding" id="contact">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>Get in Touch</h2>
+        </div>
+        <p class="section-sub reveal reveal-delay-1">Questions, feedback, or partnership inquiries — we'd love to hear from you</p>
+        <div class="contact-grid">
+          <div class="reveal reveal-delay-2">
+            <form class="contact-form" id="contact-form">
+              <div class="form-group">
+                <label for="contact-name">Name</label>
+                <input type="text" id="contact-name" placeholder="Your name" required>
+              </div>
+              <div class="form-group">
+                <label for="contact-email">Email</label>
+                <input type="email" id="contact-email" placeholder="you@example.com" required>
+              </div>
+              <div class="form-group">
+                <label for="contact-message">Message</label>
+                <textarea id="contact-message" placeholder="How can we help?" required></textarea>
+              </div>
+              <button type="submit" class="btn-primary">Send Message</button>
+            </form>
+            <div class="form-success" id="form-success">
+              <div class="form-success-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <h4>Message Sent</h4>
+              <p>Thank you for reaching out. We'll get back to you within 24 hours.</p>
+            </div>
+          </div>
+          <div class="contact-info reveal reveal-delay-3">
+            <div class="contact-info-card">
+              <div class="contact-info-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <h4>Email Us</h4>
+                <p><a href="mailto:hello@numa.app">hello@numa.app</a></p>
+              </div>
+            </div>
+            <div class="contact-info-card">
+              <div class="contact-info-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <h4>Support Hours</h4>
+                <p>Monday - Friday<br>9:00 AM - 6:00 PM EST</p>
+              </div>
+            </div>
+            <div class="contact-info-card">
+              <div class="contact-info-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+              </div>
+              <div>
+                <h4>Follow Us</h4>
+                <p><a href="#">Instagram</a> &middot; <a href="#">TikTok</a> &middot; <a href="#">X (Twitter)</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq reveal">
+          <div class="faq-heading">
+            <h3>Frequently Asked Questions</h3>
+          </div>
+          <div class="faq-list">
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                What is numerology?
+                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                <p>Numerology is an ancient system that studies the significance of numbers in your life. Using your birth date and name, it reveals patterns about your personality, purpose, and the cycles you move through. Numa uses the Pythagorean method — the most widely practiced system, rooted in the work of the Greek mathematician Pythagoras.</p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                Is my data private and secure?
+                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                <p>Absolutely. Numa is fully GDPR-compliant. You can export your data or delete your entire account at any time. We never sell your personal information, and your birth date and name are used solely to calculate your numerology profile.</p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                Is Numa free to use?
+                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                <p>Yes! Core features are completely free — your Life Path number, daily cycles, calendar, and calculator. Numa Premium unlocks unlimited AI chat with NUMA, unlimited saved profiles, and more for those who want to go deeper.</p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                What are Power Days?
+                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                <p>Power Days occur when your Personal Day number aligns with your Life Path or Personal Month number. These are days of heightened energy and manifestation potential — great for important decisions, launches, or creative work. Numa highlights them automatically in your calendar.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         8. FINAL CTA
+         ======================================== -->
+    <section class="final-cta">
+      <div class="final-cta-bg">
+        <div class="glow-orb glow-blue" style="top:50%;left:20%;width:400px;height:400px;"></div>
+        <div class="glow-orb glow-purple" style="top:30%;right:10%;width:350px;height:350px;"></div>
+      </div>
+      <div class="container" style="position:relative;z-index:1;">
+        <h2 class="reveal">The numbers are already there.<br>Are you ready to <span class="gradient-text">see them</span>?</h2>
+        <div class="reveal reveal-delay-1">
+          <button class="btn-primary" style="width:auto;padding:18px 48px;font-size:18px;margin-bottom:32px;" onclick="document.getElementById('calculator').scrollIntoView({behavior:'smooth'})">
+            Discover Your Number
+          </button>
+        </div>
+        <div class="store-badges reveal reveal-delay-2">
+          <a href="#" class="store-badge" aria-label="Download on the App Store">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            <div>
+              <span class="store-badge-sub">Download on the</span>
+              <span class="store-badge-main">App Store</span>
+            </div>
+          </a>
+          <a href="#" class="store-badge" aria-label="Get it on Google Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302a1 1 0 010 1.38l-2.302 2.302L15.082 12l2.616-2.492zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/></svg>
+            <div>
+              <span class="store-badge-sub">Get it on</span>
+              <span class="store-badge-main">Google Play</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================
+       FOOTER
+       ======================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo"><span class="gradient-text">NUMA</span></div>
+          <p class="footer-brand-tagline">Your numerology companion. Discover the hidden rhythm in your birth date and live in alignment with your natural cycles.</p>
+          <div class="social-icons">
+            <a href="#" class="social-icon" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" class="social-icon" aria-label="TikTok">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.46V13.1a8.27 8.27 0 005.58 2.17V11.8a4.83 4.83 0 01-3.77-1.34V6.69h3.77z"/></svg>
+            </a>
+            <a href="#" class="social-icon" aria-label="X (Twitter)">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h5>Product</h5>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#premium">Pricing</a></li>
+            <li><a href="#calculator">Calculator</a></li>
+            <li><a href="#">Download</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Legal</h5>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2026 Numa. All rights reserved.</p>
+        <p class="footer-made">Made with <span class="footer-heart">&hearts;</span> and mathematics</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================
+       JAVASCRIPT
+       ======================================== -->
+  <script>
+    // =====================
+    // Life Path Calculator
+    // =====================
+    const ARCHETYPES = {
+      1: { name: 'The Leader', desc: 'Independent pioneer who initiates change. Your path is about originality, courage, and forging new beginnings.' },
+      2: { name: 'The Diplomat', desc: 'Sensitive peacemaker who creates harmony. Your path is about cooperation, intuition, and balance.' },
+      3: { name: 'The Communicator', desc: 'Creative expresser who inspires joy. Your path is about artistry, optimism, and uplifting others.' },
+      4: { name: 'The Builder', desc: 'Practical builder who creates stability. Your path is about discipline, hard work, and lasting foundations.' },
+      5: { name: 'The Freedom Seeker', desc: 'Adventurous soul who embraces change. Your path is about freedom, versatility, and flowing with life.' },
+      6: { name: 'The Nurturer', desc: 'Responsible caretaker who creates harmony. Your path is about love, family, and compassionate service.' },
+      7: { name: 'The Seeker', desc: 'Analytical thinker who seeks truth. Your path is about wisdom, introspection, and spiritual depth.' },
+      8: { name: 'The Achiever', desc: 'Ambitious leader who manifests abundance. Your path is about vision, authority, and empowering others.' },
+      9: { name: 'The Humanitarian', desc: 'Compassionate soul who serves others. Your path is about generosity, wisdom, and making the world better.' },
+      11: { name: 'The Intuitive', desc: 'Spiritual messenger with heightened awareness. Your path is about inspiration, illumination, and channeling higher wisdom.' },
+      22: { name: 'The Master Builder', desc: 'Visionary who turns dreams into reality. Your path is about large-scale creation and transforming the world.' },
+      33: { name: 'The Master Teacher', desc: 'Spiritual guide devoted to healing others. Your path is about selfless service, compassion, and guiding humanity.' }
+    };
+
+    function reduceToSingle(num) {
+      while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
+        num = String(num).split('').reduce((a, b) => a + parseInt(b), 0);
+      }
+      return num;
+    }
+
+    function calculateLifePath(month, day, year) {
+      const m = reduceToSingle(month);
+      const d = reduceToSingle(day);
+      const yDigits = String(year).split('').reduce((a, b) => a + parseInt(b), 0);
+      const y = reduceToSingle(yDigits);
+      return reduceToSingle(m + d + y);
+    }
+
+    let userLifePath = null;
+
+    document.getElementById('calc-btn').addEventListener('click', function() {
+      const month = parseInt(document.getElementById('birth-month').value);
+      const day = parseInt(document.getElementById('birth-day').value);
+      const year = parseInt(document.getElementById('birth-year').value);
+
+      // Clear previous errors
+      document.querySelectorAll('.calc-field input').forEach(i => i.classList.remove('error'));
+
+      let hasError = false;
+      if (!month || month < 1 || month > 12) {
+        document.getElementById('birth-month').classList.add('error');
+        hasError = true;
+      }
+      if (!day || day < 1 || day > 31) {
+        document.getElementById('birth-day').classList.add('error');
+        hasError = true;
+      }
+      if (!year || year < 1900 || year > 2026) {
+        document.getElementById('birth-year').classList.add('error');
+        hasError = true;
+      }
+      if (hasError) return;
+
+      const lp = calculateLifePath(month, day, year);
+      userLifePath = lp;
+
+      // Show result
+      const resultEl = document.getElementById('calc-result');
+      resultEl.style.display = 'block';
+      resultEl.style.animation = 'none';
+      resultEl.offsetHeight; // trigger reflow
+      resultEl.style.animation = 'result-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+
+      document.getElementById('result-number').textContent = lp;
+      document.getElementById('result-archetype').textContent = 'Life Path ' + lp + ' \u2014 ' + ARCHETYPES[lp].name;
+      document.getElementById('result-desc').textContent = ARCHETYPES[lp].desc;
+
+      // Hide the calculate button
+      document.getElementById('calc-btn').style.display = 'none';
+
+      // Highlight in carousel
+      highlightLifePath(lp);
+    });
+
+    // Allow Enter key to trigger calculation
+    document.querySelectorAll('.calc-field input').forEach(input => {
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('calc-btn').click();
+        }
+      });
+      // Auto-advance to next field
+      input.addEventListener('input', function() {
+        const maxLen = this.id === 'birth-year' ? 4 : 2;
+        if (this.value.length >= maxLen) {
+          const fields = ['birth-month', 'birth-day', 'birth-year'];
+          const idx = fields.indexOf(this.id);
+          if (idx < fields.length - 1) {
+            document.getElementById(fields[idx + 1]).focus();
+          }
+        }
+      });
+    });
+
+    // =====================
+    // Life Path Carousel
+    // =====================
+    function highlightLifePath(num) {
+      document.querySelectorAll('.lp-card').forEach(card => {
+        card.classList.remove('highlighted');
+        if (parseInt(card.dataset.lp) === num) {
+          card.classList.add('highlighted');
+          setTimeout(() => {
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }, 300);
+        }
+      });
+    }
+
+    // =====================
+    // Scroll Reveal
+    // =====================
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // =====================
+    // Nav Background
+    // =====================
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    }, { passive: true });
+
+    // =====================
+    // Smooth scroll for anchor links
+    // =====================
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        const target = document.querySelector(targetId);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // =====================
+    // Hamburger Menu
+    // =====================
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      mobileMenu.classList.toggle('open');
+    });
+    // Close mobile menu when a link is clicked
+    document.querySelectorAll('.mobile-menu-link').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('open');
+      });
+    });
+
+    // =====================
+    // Contact Form
+    // =====================
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      this.style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    });
+
+    // =====================
+    // FAQ Accordion
+    // =====================
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const item = this.closest('.faq-item');
+        const isOpen = item.classList.contains('open');
+        // Close all
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        document.querySelectorAll('.faq-question').forEach(q => q.setAttribute('aria-expanded', 'false'));
+        // Toggle current
+        if (!isOpen) {
+          item.classList.add('open');
+          this.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
